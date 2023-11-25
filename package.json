@@ -1,0 +1,21 @@
+{
+  "name": "js-publisher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "a-parser-types": "^0.1.338",
+    "amqplib": "^0.10.3",
+    "csv-parse": "^5.5.2",
+    "fs": "^0.0.1-security",
+    "jsdom": "^22.1.0"
+  },
+  "type": "module"
+}
