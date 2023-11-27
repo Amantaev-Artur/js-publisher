@@ -3,6 +3,7 @@ import amqp from "amqplib";
 import fs from "fs";
 import { parse } from "csv-parse";
 
+const queue = "users_from_habr";
 
 let users = []
 await fs.createReadStream("./habr.csv")
@@ -14,25 +15,26 @@ await fs.createReadStream("./habr.csv")
     console.log(error.message);
   })
   .on("end", function () {
+    publish(users)
     console.log("read file: finished");
   });
 
-await users.forEach(async (user) => {
-  let response = await fetch(user.url);
-  let responseText = await response.text();
+async function parseUsers(users) {
+  for (const user of users) {
+    let response = await fetch(user.url);
+    let responseText = await response.text();
 
-  const dom = new jsdom.JSDOM(responseText)
-  const name = dom.window.document.querySelector(".page-title__title").textContent;
+    const dom = new jsdom.JSDOM(responseText)
+    const name = dom.window.document.querySelector(".page-title__title").textContent;
 
-  user.name = name;
-  user.html = responseText;
-})
-// не работает. Нужно проверить await
-console.log(users)
+    user.name = name;
+    user.html = responseText;
+  }
+}
 
-const queue = "users_from_habr";
+async function publish(users) {
+  await parseUsers(users)
 
-(async () => {
   let connection;
   try {
     connection = await amqp.connect("amqp://guest:guest@localhost:5672/");
@@ -47,4 +49,4 @@ const queue = "users_from_habr";
   } finally {
     if (connection) await connection.close();
   }
-})();
+}
